@@ -93,7 +93,7 @@ class Float3(Vec3):
 		return Float3(self.x, self.y, self.z) / self.mag()
 
 
-class Int(Vec3):
+class Int3(Vec3):
 	def __init__(self, x=0.0, y=0.0, z=0.0):
 		self.x = int(x)
 		self.y = int(y)

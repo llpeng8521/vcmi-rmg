@@ -3,6 +3,8 @@
 
 """区域划分"""
 
+import math
+
 from vector import Int3
 from vector import Float3
 
@@ -64,7 +66,7 @@ class CZonePlacer(object):
 				totalForces[zone] = distance
 
 			# 2. separate overlapping zones
-			self.separateOverlappingZones(zone, forces, overlaps)
+			self.separateOverlappingZones(zones, forces, overlaps)
 			for zone, distance in forces.items():
 				zone.SetCenter(zone.GetCenter() + distance)
 				totalForces[zone] = distance
@@ -89,10 +91,10 @@ class CZonePlacer(object):
 				if totalDistance + totalOverlap < bestTotalDistance + bestTotalOverlap:
 					improvement = True
 
-			print "Total distance between zones after this iteration: %2.4f, Total overlap: %2.4f, Improved: %s" % (totalDistance, totalOverlap , improvement)
+			print "Total distance between zones after this iteration: %2.4f, Total overlap: %2.4f, Improved: %s" % \
+				(totalDistance, totalOverlap , improvement)
 
 			# save best solution
-
 			if improvement:
 				bestTotalDistance = totalDistance
 				bestTotalOverlap = totalOverlap
@@ -113,10 +115,10 @@ class CZonePlacer(object):
 		zonesToPlace = []
 		for zone in zonesVector:
 			totalSize += zone.GetSize() * zone.GetSize()
-			randomAngle = oRandGen.NextDouble(0, pi2):
+			randomAngle = oRandGen.NextDouble(0, pi2)
 			# place zones around circle
-			x = 0.5 + raduis * math.sin(randomAngle)
-			y = 0.5 + raduis * math.cos(randomAngle)
+			x = 0.5 + radius * math.sin(randomAngle)
+			y = 0.5 + radius * math.cos(randomAngle)
 			zone.SetCenter(Float3(x, y, 0))
 
 		"""
@@ -127,7 +129,7 @@ class CZonePlacer(object):
 		self.m_MapSize = math.sqrt(self.m_Width * self.m_Height)
 		prescaler = self.m_MapSize / (totalSize * 3.14)
 		for zone in zones.values():
-			zone.SetSize(self.GetSize() * prescaler)
+			zone.SetSize(zone.GetSize() * prescaler)
 
 	def attractConnectedZones(self, zones, forces, distances):
 		for zone in zones.values():
@@ -158,7 +160,7 @@ class CZonePlacer(object):
 			forceVector.z = 0
 			forces[zone] = forceVector
 
-	def separateOverlappingZones(self, zones, forces, distances):
+	def separateOverlappingZones(self, zones, forces, overlaps):
 		for zone in zones.values():
 			forceVector = Float3()
 			pos = zone.GetCenter()
@@ -181,23 +183,23 @@ class CZonePlacer(object):
 			# do not scale boundary distance - zones tend to get squashed
 			size = zone.GetSize() / self.m_MapSize
 			if pos.x < size:
-				overlap, forceVector = self.pushAwayFromBoundary(0, pos.y, pos, size, overlap)
+				overlap, forceVector = self.pushAwayFromBoundary(0, pos.y, pos, size, overlap, forceVector)
 			if pos.x > 1 - size:
-				overlap, forceVector = self.pushAwayFromBoundary(1, pos.y, pos, size, overlap)
+				overlap, forceVector = self.pushAwayFromBoundary(1, pos.y, pos, size, overlap, forceVector)
 			if pos.y < size:
-				overlap, forceVector = self.pushAwayFromBoundary(pos.x, 0, pos, size, overlap)
+				overlap, forceVector = self.pushAwayFromBoundary(pos.x, 0, pos, size, overlap, forceVector)
 			if pos.y > 1 - size:
-				overlap, forceVector = self.pushAwayFromBoundary(pos.x, 1, pos, size, overlap)
+				overlap, forceVector = self.pushAwayFromBoundary(pos.x, 1, pos, size, overlap, forceVector)
 			overlaps[zone] = overlap
 			forceVector.z = 0
 			forces[zone] = forceVector
 
-	def pushAwayFromBoundary(self, x, y, pos, size, overlap):
+	def pushAwayFromBoundary(self, x, y, pos, size, overlap, forceVector):
 		boundary = Float3(x, y, pos.z);
 		distance = pos.dist2d(boundary);
 		# check if we're closer to map boundary than value of zone size
 		overlap = overlap + max(0, distance - size)
-		forceVector -= (boundary - pos) * (size - distance) / self.GetDistance(distance) * self.m_StiffnessConstant
+		forceVector = forceVector - (boundary - pos) * (size - distance) / self.GetDistance(distance) * self.m_StiffnessConstant
 		return overlap, forceVector
 
 	def moveOneZone(self, zones, totalForces, distances, overlaps):
@@ -206,7 +208,7 @@ class CZonePlacer(object):
 		maxDistanceMovementRatio = len(zones) * len(zones)
 		misplacedZone = None
 
-		totalDistance = sun(distances.values())
+		totalDistance = sum(distances.values())
 		totalOverlap = sum(overlaps.values())
 
 		# find most misplaced zone
@@ -240,8 +242,8 @@ class CZonePlacer(object):
 				size = targetZone.GetSize()
 				vec = center - ourCenter
 				newDistanceBetweenZones = max(ourSize, size) / self.m_MapSize
-				print "Trying to move zone %d %s towards %d %s. Old distance %f" %
-					(misplacedZone.GetId(), str(ourCenter), targetZone.getId(), str(center), maxDistance)
+				print "Trying to move zone %d %s towards %d %s. Old distance %f" % \
+						(misplacedZone.GetId(), str(ourCenter), targetZone.getId(), str(center), maxDistance)
 				print "direction is %s" % str(vec)
 
 				misplacedZone.SetCenter(center - vec.unitVector() * newDistanceBetweenZones)
@@ -261,7 +263,7 @@ class CZonePlacer(object):
 				center = targetZone.GetCenter()
 				size = targetZone.GetSize()
 				newDistanceBetweenZones = (ourSize + size) / self.m_MapSize
-				print "Trying to move zone %d %s towards %d %s. Old distance %f" %
+				print "Trying to move zone %d %s towards %d %s. Old distance %f" % \
 						(misplacedZone.GetId(), str(ourCenter), targetZone.getId(), str(center), maxOverlap)
 				print "direction is %s", str(center - ourCenter)
 
@@ -311,7 +313,7 @@ class CZonePlacer(object):
 				distances = []
 				pos = Int3(i, j, 0)
 				for zone in zones.values():
-					distances.append((zone, pos.dist2dSQ(zone.GetPos())))
+					distances.append((zone, self.metric(pos, zone.GetPos())))
 				closestZone = self.getClosestTile(distances)
 				closestZone.AddTile(pos)
 				self.m_MapGen.SetZoneID(pos, zone.GetId())
@@ -330,7 +332,7 @@ class CZonePlacer(object):
 		index = distanceBySize.index(minDistance)
 		return distances[index][0]
 
-	def compareByDistance(self, distances):
+	def compareByDistance(self, lhs, rhs):
 		return lhs[1] / lhs[0].GetSize() < rhs[1] / rhs[0].GetSize()
 
 	def moveZoneToCenterOfMass(self, zone):
@@ -349,7 +351,7 @@ class CZonePlacer(object):
 		d = 0.01 * dx^3 - 0.1618 * dx^2 + 1 * dx + ...
 			0.01618 * dy^3 + 0.1 * dy^2 + 0.168 * dy;
 		"""
-		dx = abs(A.x - B.x) * self.m_ScaleX
-		dy = abs(A.y - B.y) * self.m_ScaleY
-		return dx * (1 + dx * (0.1 + dx * 0.01)) + 
+		dx = abs(int3A.x - int3B.x) * self.m_ScaleX
+		dy = abs(int3A.y - int3B.y) * self.m_ScaleY
+		return dx * (1 + dx * (0.1 + dx * 0.01)) + \
 			dy * (1.618 + dy * (-0.1618 + dy * 0.01618))
