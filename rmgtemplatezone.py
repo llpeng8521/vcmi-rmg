@@ -48,7 +48,7 @@ class CTileInfo(object):
 	def SetOccupied(self, nType):
 		self.m_TileType = nType
 
-	def SetTileTyp(self, nType):
+	def SetTileType(self, nType):
 		self.m_TileType = nType
 
 	def GetTileType(self):
@@ -120,8 +120,8 @@ class CRmgTemplateZone(object):
 	m_QuestArtZone = None
 
 	# 物品信息
-	m_TerrainInfo = []
-	m_possibleObjects = []
+	m_TreasureInfo = []
+	m_PossibleObjects = []
 
 	m_RequiredObjects = []
 	m_CloseObjects = []
@@ -153,17 +153,17 @@ class CRmgTemplateZone(object):
 		self.m_NeutralTowns = self._parseTemplateZoneTowns(dZoneInfo.get("neutralTowns", {}))
 
 		defaultTerTypes = ETerrainType.Default
-		self.m_TerrainTypes = self._parseTerrainType(dZoneInfo.get("terrainTypes", []), defaultTerTypes)
+		self.m_TerrainTypes = self._parseTerrainTypes(dZoneInfo.get("terrainTypes", []), defaultTerTypes)
 
-	def _parseTemplateZoneTowns(self, dDate):
+	def _parseTemplateZoneTowns(self, dData):
 		oTown = CTownInfo()
-		oTown.m_TownCount = dDate.get("towns", 0)
-		oTown.m_CastleCount = dDate.get("castles", 0)
-		oTown.m_TownDensity = dDate.get("townDensity", 0)
-		oTown.m_CastleDensity = dDate.get("castleDensity", 0)
+		oTown.m_TownCount = dData.get("towns", 0)
+		oTown.m_CastleCount = dData.get("castles", 0)
+		oTown.m_TownDensity = dData.get("townDensity", 0)
+		oTown.m_CastleDensity = dData.get("castleDensity", 0)
 		return oTown
 
-	def _parseTerrainType(self, lTerTypeStrings, defaultTerTypes):
+	def _parseTerrainTypes(self, lTerTypeStrings, defaultTerTypes):
 		if not lTerTypeStrings:
 			return defaultTerTypes
 		setTerTypes = set()

@@ -11,11 +11,11 @@ from util import Matrix
 class CTerrainTile(object):
 	"""地图格子的地形"""
 	m_TerType = ETerrainType.BORDER
-	m_TerView = None
+	m_TerView = 0
 	m_RiverType = ERiverType.NO_RIVER
-	m_RiverView = None
+	m_RiverDir = 0
 	m_RoadType = ERoadType.NO_ROAD
-	m_RoadView = None
+	m_RoadView = 0
 
 	m_bVisitable = False
 	m_bBlocked = False

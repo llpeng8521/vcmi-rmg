@@ -17,11 +17,11 @@ class CRmgTemplate(object):
 	m_Connections = None
 
 	def __init__(self):
-		self.m_Zones = {}  # {ZoneId, CRmgTemplateZone}
+		self.m_Zones = {}  # {ZoneId: CRmgTemplateZone}
 		self.m_Connections = []  # [CRmgTemplateZoneConnection]
 
-	def ParseData(self, dDate):
-		for sName, dInfo in dDate.items():
+	def ParseData(self, dData):
+		for sName, dInfo in dData.items():
 			self.m_Name = str(sName)
 			self.m_MinSize = self._parseMapSize(dInfo["minSize"])
 			self.m_MaxSize = self._parseMapSize(dInfo["maxSize"])

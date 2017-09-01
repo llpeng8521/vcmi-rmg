@@ -92,7 +92,7 @@ class CZonePlacer(object):
 					improvement = True
 
 			print "Total distance between zones after this iteration: %2.4f, Total overlap: %2.4f, Improved: %s" % \
-				(totalDistance, totalOverlap , improvement)
+				(totalDistance, totalOverlap, improvement)
 
 			# save best solution
 			if improvement:

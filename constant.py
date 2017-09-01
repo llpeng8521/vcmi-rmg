@@ -45,7 +45,7 @@ class ETerrainType:
 		"sand": SAND,
 		"grass": GRASS,
 		"snow": SNOW,
-		"swamp": ROUGH,
+		"swamp": SWAMP,
 		"rough": ROUGH,
 		"subterra": SUBTERRANEAN,
 		"lava": LAVA,

@@ -101,3 +101,16 @@ class Int3(Vec3):
 
 	def mandist2d(self, v):
 		return abs(self.x - v.x) + abs(self.y - v.y)
+
+
+def Test():
+	v1 = Int3(1.0, 1.0, 1.0)
+	v2 = Int3(1.0, 0.0, 0.0)
+
+	print(v1+v2)
+	v1 += v2
+	print v1
+
+
+if __name__ == '__main__':
+	Test()

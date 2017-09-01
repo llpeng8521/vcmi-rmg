@@ -78,16 +78,16 @@ class CMapGenerator(object):
 	m_Map = None  # 地图对象
 
 	m_RandGen = None  # 随机数据产生器
-	m_RandomSeed = None  # 随机种子
+	m_RandomSeed = 0  # 随机种子
 
 	m_Zones = None  # 区域连通
-	m_Tiles = None 
+	m_Tiles = None
 
 	m_ZoneColouring = None
 
 	def __init__(self):
 		self.m_RandGen = CRandomGenerator()
-		self.m_Zones = []
+		self.m_Zones = {}
 		self.m_Tiles = []
 
 		import mapobject
@@ -110,7 +110,7 @@ class CMapGenerator(object):
 		self.GenZones()
 
 	def InitTiles(self):
-		"""初始化地图数据"""
+		"""初始化格子"""
 		self.m_Map.InitTerrain()
 		nWidth = self.m_Map.GetWidth()
 		nHeight = self.m_Map.GetHeight()
@@ -132,13 +132,13 @@ class CMapGenerator(object):
 		print "Zones generated successfully"
 
 
-		# ==========================================
-		# 地图数据处理
-		# ==========================================
-		def checkIsOnMap(self, tile):
-			if not self.m_Map.IsInTheMap(tile):
-				raise "Tile %s is outside the map" % str(tile)
+	# ==========================================
+	# 地图数据处理
+	# ==========================================
+	def checkIsOnMap(self, tile):
+		if not self.m_Map.IsInTheMap(tile):
+			raise "Tile %s is outside the map" % str(tile)
 
-		def SetZoneID(self, tile, zoneId):
-			self.checkIsOnMap(tile)
-			self.m_ZoneColouring[tile.x][tile.y] = zoneId
+	def SetZoneID(self, tile, zoneId):
+		self.checkIsOnMap(tile)
+		self.m_ZoneColouring[tile.x][tile.y] = zoneId
